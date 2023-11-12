@@ -4,7 +4,7 @@ import { HiEye, HiEyeOff } from "react-icons/hi";
 import SmallWithNavigation from "../../components/Footer";
 import { useState } from "react";
 
-export default function Login() {
+export default function Register() {
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
 
@@ -40,13 +40,7 @@ export default function Login() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    if (!formData.password || formData.password.length < 6) {
-      setError((prevError) => ({ ...prevError, password: "Password must be at least 6 characters" }));
-      return;
-    }
-
-    console.log("Form data submitted:", formData.email, formData.password);
+    window.location.href = "/completeDataUser";
   };
 
   return (
