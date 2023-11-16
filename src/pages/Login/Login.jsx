@@ -54,11 +54,13 @@ export default function Login() {
       return;
     }
     console.log("Form data submitted:", formData.email, formData.password);
+    console.log("Form Data ", formData);
 
     try {
       const res = await post("login", formData); // Assuming your login API endpoint is "/login"
       if (res.status === 200) {
         setToken(res.data.token);
+        console.log(res.data.token);
         console.log("Sukses Login");
         navigate("/dashboard");
         // Redirect to the dashboard or home page

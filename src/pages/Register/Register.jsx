@@ -3,19 +3,34 @@ import { Link } from "react-router-dom";
 import { HiEye, HiEyeOff } from "react-icons/hi";
 import SmallWithNavigation from "../../components/Footer";
 import { useState } from "react";
+import { useAPI } from "../../config/api";
+import { useNavigate } from "react-router-dom";
+import useTokenStore from "../../config/store";
 
 export default function Register() {
+  const { post } = useAPI((state) => state);
+  const { setToken } = useTokenStore((state) => state);
+  let navigate = useNavigate();
+
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    role: "",
   });
 
   const [error, setError] = useState({
     email: "",
     password: "",
+    role: "",
+  });
+
+  const [userData, setUserData] = useState({
+    email: "",
+    role: "",
+    userId: "",
   });
 
   const handleInputChange = (e) => {
@@ -38,9 +53,26 @@ export default function Register() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    window.location.href = "/completeDataUser";
+    console.log("Data", formData);
+    try {
+      const res = await post("/users/register", formData);
+      if (res.status === 201) {
+        setToken(res.data.token);
+        const userId = res.data.id;
+        console.log("User ID:", userId);
+
+        setUserData({
+          email: formData.email,
+          role: formData.role,
+          userId: userId,
+        });
+
+        console.log("Navigating to /completeDataUser");
+        navigate("/completeDataUser", { state: { formData, userId } });
+      }
+    } catch (error) {}
   };
 
   return (
@@ -75,9 +107,9 @@ export default function Register() {
                 {error.password && <Text color="red.500">{error.password}</Text>}
               </FormControl>
 
-              <Select placeholder="Role">
-                <option>User</option>
-                <option>Foudation</option>
+              <Select placeholder="Role" name="role" onChange={handleInputChange}>
+                <option value="user">User</option>
+                <option value="foundation">Foudation</option>
               </Select>
 
               <Stack spacing={6} mt={5}>

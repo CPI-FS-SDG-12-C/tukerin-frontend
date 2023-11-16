@@ -1,8 +1,58 @@
-import React from "react";
-import { Button, Flex, Text, FormControl, InputGroup, Heading, Input, Stack, Image, Textarea, Icon, Select } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { Button, AlertIcon, Alert, Flex, Text, FormControl, InputGroup, Heading, Input, Stack, Image, Textarea, Icon, Select } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useAPI } from "../../config/api";
+import { useNavigate } from "react-router-dom";
+import useTokenStore from "../../config/store";
 
 function CompleteUserData() {
+  const location = useLocation();
+  const { email, role } = location.state.formData;
+  // const { userId } = location.state.userId;
+  const { userId } = location.state;
+  const { post } = useAPI((state) => state);
+  const { setToken } = useTokenStore((state) => state);
+  let navigate = useNavigate();
+
+  const [complete, setcomplete] = useState(false);
+
+  console.log("id", userId, email, role);
+
+  const [formData, setFormData] = useState({
+    userId: userId,
+    fullName: "",
+    phoneNumber: "",
+    address: "",
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("Data", formData);
+    try {
+      const res = await post("/users/complete-profile", formData);
+      if (res.status === 200) {
+        setToken(res.data.token);
+        setcomplete(true);
+      }
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    if (complete) {
+      const timeoutId = setTimeout(() => {
+        navigate("/dashboard");
+      }, 3000);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [complete]);
+
   return (
     <>
       <Stack minH={"100vh"} direction={{ base: "column", md: "row" }}>
@@ -17,25 +67,24 @@ function CompleteUserData() {
               </Link>
             </Heading>
             <Heading fontSize={"2xl"}>Complete Your Data</Heading>
-            <form>
-              <FormControl id="email" py={5}>
-                <Input type="email" name="email" placeholder="Email" />
-              </FormControl>
+            <FormControl id="email" py={5}>
+              <Input placeholder={email} isDisabled />
+            </FormControl>
 
-              <Select placeholder="Role">
-                <option>User</option>
-                <option>Foudation</option>
-              </Select>
+            <FormControl id="role">
+              <Input placeholder={role} isDisabled />
+            </FormControl>
 
+            <form onSubmit={handleSubmit}>
               <FormControl id="fullName" py={5}>
-                <Input type="fullName" name="fullName" placeholder="FullName" />
+                <Input type="fullName" name="fullName" placeholder="FullName" onChange={handleInputChange} />
               </FormControl>
 
-              <FormControl id="phone" mb={5}>
-                <Input type="text" name="phone" placeholder="Phone" />
+              <FormControl id="phoneNumber" mb={5}>
+                <Input type="text" name="phoneNumber" placeholder="Phone" onChange={handleInputChange} />
               </FormControl>
 
-              <Textarea placeholder="Alamat" size="sm" />
+              <Textarea name="address" placeholder="Address" size="sm" onChange={handleInputChange} />
 
               <Stack spacing={6} mt={5}>
                 <Button type="submit" colorScheme="orange" variant="solid">
@@ -43,6 +92,14 @@ function CompleteUserData() {
                 </Button>
               </Stack>
             </form>
+            {complete && (
+              <Stack spacing={3}>
+                <Alert status="success">
+                  <AlertIcon />
+                  Data Complete, please Login
+                </Alert>
+              </Stack>
+            )}
           </Stack>
         </Flex>
         <Flex flex={1}>

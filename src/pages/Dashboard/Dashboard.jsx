@@ -1,11 +1,12 @@
 "use client";
 
 import { IconButton, Avatar, Box, CloseButton, Flex, HStack, VStack, Icon, useColorModeValue, Text, Drawer, DrawerContent, useDisclosure, Menu, MenuButton, MenuDivider, MenuItem, MenuList } from "@chakra-ui/react";
-import { FiHome, FiTrendingUp, FiMenu, FiChevronDown } from "react-icons/fi";
+import { FiMenu, FiChevronDown } from "react-icons/fi";
 import { FaHandHolding } from "react-icons/fa";
 import { AiOutlineOrderedList } from "react-icons/ai";
 import { BiAddToQueue } from "react-icons/bi";
 import { GiTrade } from "react-icons/gi";
+import useTokenStore from "../../config/store";
 
 const items = [
   { name: "List Items", icon: AiOutlineOrderedList },
@@ -92,6 +93,29 @@ const NavItem = ({ icon, children, ...rest }) => {
 };
 
 const MobileNav = ({ onOpen, ...rest }) => {
+  const token = useTokenStore((state) => state.token);
+
+  function parseJwt(token) {
+    try {
+      return JSON.parse(atob(token.split(".")[1]));
+    } catch (e) {
+      return null;
+    }
+  }
+  const decodedToken = parseJwt(token);
+  const fullName = decodedToken?.fullName;
+  const role = decodedToken?.role;
+
+  console.log(decodedToken);
+  console.log("FullName", fullName);
+  console.log("Role", role);
+
+  const setToken = useTokenStore((state) => state.setToken);
+  const logout = () => {
+    console.log("Logout");
+    setToken(null);
+  };
+
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -118,9 +142,9 @@ const MobileNav = ({ onOpen, ...rest }) => {
               <HStack>
                 <Avatar size={"sm"} src={"https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg"} />
                 <VStack display={{ base: "none", md: "flex" }} alignItems="flex-start" spacing="1px" ml="2">
-                  <Text fontSize="sm">Justina Clark</Text>
+                  <Text fontSize="sm">{fullName}</Text>
                   <Text fontSize="xs" color="gray.600">
-                    Foundation
+                    {role}
                   </Text>
                 </VStack>
                 <Box display={{ base: "none", md: "flex" }}>
@@ -131,7 +155,7 @@ const MobileNav = ({ onOpen, ...rest }) => {
             <MenuList bg={useColorModeValue("white", "gray.900")} borderColor={useColorModeValue("gray.200", "gray.700")}>
               <MenuItem>Acount Settings</MenuItem>
               <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              <MenuItem onClick={logout}>Sign out</MenuItem>
             </MenuList>
           </Menu>
         </Flex>
