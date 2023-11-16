@@ -1,12 +1,20 @@
 import { Button, Flex, Text, FormControl, InputGroup, Heading, Input, Stack, Image, InputRightElement, Icon } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { HiEye, HiEyeOff } from "react-icons/hi";
+import { useNavigate } from "react-router-dom";
 import SmallWithNavigation from "../../components/Footer";
 import { useState } from "react";
+import useTokenStore from "../../config/store";
+import { useAPI } from "../../config/api";
 
 export default function Login() {
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
+  let navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const { setToken } = useTokenStore((state) => state);
+  const { post } = useAPI((state) => state);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -38,15 +46,30 @@ export default function Login() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.password || formData.password.length < 6) {
       setError((prevError) => ({ ...prevError, password: "Password must be at least 6 characters" }));
       return;
     }
-
     console.log("Form data submitted:", formData.email, formData.password);
+
+    try {
+      const res = await post("login", formData); // Assuming your login API endpoint is "/login"
+      if (res.status === 200) {
+        setToken(res.data.token);
+        console.log("Sukses Login");
+        navigate("/dashboard");
+        // Redirect to the dashboard or home page
+      } else {
+        // Handle unsuccessful login, show error message or set state accordingly
+        console.log("Username atau password salah");
+        setErrorMessage("Username or password is incorrect");
+      }
+    } catch (error) {
+      // Handle API request error
+    }
   };
 
   return (
@@ -84,6 +107,11 @@ export default function Login() {
                   Sign in
                 </Button>
               </Stack>
+              {errorMessage && (
+                <Stack mt={4}>
+                  <Text color="red.500">{errorMessage}</Text>
+                </Stack>
+              )}
             </form>
             <Stack pt={6}>
               <Text align="center">
