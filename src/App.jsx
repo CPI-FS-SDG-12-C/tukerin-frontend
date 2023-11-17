@@ -25,7 +25,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/completeDataUser" element={<CompleteUserData />} />
         <Route
-          path="/dashboard"
+          path="/dashboard/*"
           element={
             <ProtectedRoute>
               <Dashboard />

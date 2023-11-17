@@ -1,68 +1,41 @@
-"use client";
-
 import { IconButton, Avatar, Box, CloseButton, Flex, HStack, VStack, Icon, useColorModeValue, Text, Drawer, DrawerContent, useDisclosure, Menu, MenuButton, MenuDivider, MenuItem, MenuList } from "@chakra-ui/react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 import { FiMenu, FiChevronDown } from "react-icons/fi";
 import { FaHandHolding } from "react-icons/fa";
 import { AiOutlineOrderedList } from "react-icons/ai";
 import { BiAddToQueue } from "react-icons/bi";
 import { GiTrade } from "react-icons/gi";
 import useTokenStore from "../../config/store";
+import Item from "../Items/Item";
 
 const items = [
-  { name: "List Items", icon: AiOutlineOrderedList },
-  { name: "Add Items", icon: BiAddToQueue },
+  { name: "List Items", icon: AiOutlineOrderedList, to: "/items" },
+  { name: "Add Items", icon: BiAddToQueue, to: "/add-items" },
 ];
 
-const donations = [{ name: "List Of Donation", icon: FaHandHolding }];
+const donations = [
+  { name: "List Of Donation", icon: FaHandHolding, to: "/list-of-donations" },
+  { name: "Donation", icon: FaHandHolding, to: "/donation" },
+];
 
 const trades = [
-  { name: "List Trade Items", icon: AiOutlineOrderedList },
-  { name: "Trade Approvel", icon: GiTrade },
+  { name: "List Trade Items", icon: AiOutlineOrderedList, to: "/list-trade-items" },
+  { name: "Trade Approvel", icon: GiTrade, to: "/trade-approval" },
 ];
 
-const SidebarContent = ({ onClose, ...rest }) => {
-  return (
-    <Box transition="3s ease" bg={useColorModeValue("white", "gray.900")} borderRight="1px" borderRightColor={useColorModeValue("gray.200", "gray.700")} w={{ base: "full", md: 60 }} pos="fixed" h="full" {...rest}>
-      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" color={"orange"}>
-          Tukerin
-          <Text as={"span"} color={"black"}>
-            .
-          </Text>
-        </Text>
-        <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
-      </Flex>
-      <Text ml={10} color={"gray.500"}>
-        Items
-      </Text>
-      {items.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
-          {link.name}
-        </NavItem>
-      ))}
-      <Text ml={10} color={"gray.500"} mt={5}>
-        Donations
-      </Text>
-      {donations.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
-          {link.name}
-        </NavItem>
-      ))}
-      <Text ml={10} color={"gray.500"} mt={5}>
-        Trade
-      </Text>
-      {trades.map((link) => (
-        <NavItem key={link.name} icon={link.icon}>
-          {link.name}
-        </NavItem>
-      ))}
-    </Box>
-  );
-};
+function parseJwt(token) {
+  try {
+    return JSON.parse(atob(token.split(".")[1]));
+  } catch (e) {
+    return null;
+  }
+}
 
-const NavItem = ({ icon, children, ...rest }) => {
+const NavItem = ({ icon, to, children, ...rest }) => {
   return (
-    <Box as="a" href="#" style={{ textDecoration: "none" }} _focus={{ boxShadow: "none" }}>
+    <Link to={`/dashboard${to}`} style={{ textDecoration: "none" }}>
       <Flex
         align="center"
         p="4"
@@ -88,20 +61,111 @@ const NavItem = ({ icon, children, ...rest }) => {
         )}
         {children}
       </Flex>
+    </Link>
+  );
+};
+
+const SidebarContent = ({ onClose, role, ...rest }) => {
+  let menuItems;
+
+  if (role === "user") {
+    menuItems = (
+      <>
+        <Text ml={10} color={"gray.500"}>
+          Items
+        </Text>
+        {items.map((link) => (
+          <NavItem key={link.name} icon={link.icon} to={link.to}>
+            {link.name}
+          </NavItem>
+        ))}
+        <Text ml={10} color={"gray.500"} mt={5}>
+          Donations
+        </Text>
+        {donations.map((link) => (
+          <NavItem key={link.name} icon={link.icon} to={link.to}>
+            {link.name}
+          </NavItem>
+        ))}
+        <Text ml={10} color={"gray.500"} mt={5}>
+          Trade
+        </Text>
+        {trades.map((link) => (
+          <NavItem key={link.name} icon={link.icon} to={link.to}>
+            {link.name}
+          </NavItem>
+        ))}
+      </>
+    );
+  } else if (role === "foundation") {
+    menuItems = (
+      <>
+        <Text ml={10} color={"gray.500"} mt={5}>
+          Donations
+        </Text>
+        {donations.map((link) => (
+          <NavItem key={link.name} icon={link.icon} to={link.to}>
+            {link.name}
+          </NavItem>
+        ))}
+      </>
+    );
+  } else {
+    // Handle other roles or provide a default menu
+    menuItems = null;
+  }
+
+  return (
+    <Box transition="3s ease" bg={useColorModeValue("white", "gray.900")} borderRight="1px" borderRightColor={useColorModeValue("gray.200", "gray.700")} w={{ base: "full", md: 60 }} pos="fixed" h="full" {...rest}>
+      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold" color={"orange"}>
+          Tukerin
+          <Text as={"span"} color={"black"}>
+            .
+          </Text>
+        </Text>
+        <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
+      </Flex>
+      {menuItems}
     </Box>
   );
 };
 
+// const NavItem = ({ icon, children, ...rest }) => {
+//   return (
+//     <Link style={{ textDecoration: "none" }}>
+//       <Flex
+//         align="center"
+//         p="4"
+//         mx="4"
+//         borderRadius="lg"
+//         role="group"
+//         cursor="pointer"
+//         _hover={{
+//           bg: "orange",
+//           color: "white",
+//         }}
+//         {...rest}
+//       >
+//         {icon && (
+//           <Icon
+//             mr="4"
+//             fontSize="16"
+//             _groupHover={{
+//               color: "white",
+//             }}
+//             as={icon}
+//           />
+//         )}
+//         {children}
+//       </Flex>
+//     </Link>
+//   );
+// };
+
 const MobileNav = ({ onOpen, ...rest }) => {
   const token = useTokenStore((state) => state.token);
 
-  function parseJwt(token) {
-    try {
-      return JSON.parse(atob(token.split(".")[1]));
-    } catch (e) {
-      return null;
-    }
-  }
   const decodedToken = parseJwt(token);
   const fullName = decodedToken?.fullName;
   const role = decodedToken?.role;
@@ -167,9 +231,13 @@ const MobileNav = ({ onOpen, ...rest }) => {
 const Dashboard = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  const token = useTokenStore((state) => state.token);
+  const decodedToken = parseJwt(token);
+  const role = decodedToken?.role;
+
   return (
     <Box minH="100vh" bg={useColorModeValue("gray.100", "gray.900")}>
-      <SidebarContent onClose={() => onClose} display={{ base: "none", md: "block" }} />
+      <SidebarContent onClose={() => onClose} role={role} display={{ base: "none", md: "block" }} />
       <Drawer isOpen={isOpen} placement="left" onClose={onClose} returnFocusOnClose={false} onOverlayClick={onClose} size="full">
         <DrawerContent>
           <SidebarContent onClose={onClose} />
@@ -179,6 +247,9 @@ const Dashboard = () => {
       <MobileNav onOpen={onOpen} />
       <Box ml={{ base: 0, md: 60 }} p="4">
         {/* Content */}
+        <Routes>
+          <Route path="/items" element={<Item />} />
+        </Routes>
       </Box>
     </Box>
   );
