@@ -9,6 +9,7 @@ import { BiAddToQueue } from "react-icons/bi";
 import { GiTrade } from "react-icons/gi";
 import useTokenStore from "../../config/store";
 import Item from "../Items/Item";
+import AddItem from "../Items/AddItem";
 
 const items = [
   { name: "List Items", icon: AiOutlineOrderedList, to: "/items" },
@@ -169,10 +170,12 @@ const MobileNav = ({ onOpen, ...rest }) => {
   const decodedToken = parseJwt(token);
   const fullName = decodedToken?.fullName;
   const role = decodedToken?.role;
+  const id = decodedToken?.id;
 
   console.log(decodedToken);
   console.log("FullName", fullName);
   console.log("Role", role);
+  console.log("ID", id);
 
   const setToken = useTokenStore((state) => state.setToken);
   const logout = () => {
@@ -249,6 +252,7 @@ const Dashboard = () => {
         {/* Content */}
         <Routes>
           <Route path="/items" element={<Item />} />
+          <Route path="/add-items" element={<AddItem />} />
         </Routes>
       </Box>
     </Box>
