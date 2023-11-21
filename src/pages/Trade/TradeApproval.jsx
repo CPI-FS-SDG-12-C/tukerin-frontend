@@ -49,50 +49,8 @@ const TradeApproval = () => {
             <Th>Action</Th>
           </Tr>
         </Thead>
-        <Tbody>
-          {barterRequests.map((barter) => (
-            <Tr key={barter.id}>
-              <Td>{barter.requesterItem.name}</Td>
-              <Td>{barter.desiredItem.name}</Td>
-              <Td>
-                <Button colorScheme="teal" variant="solid" onClick={() => handleApproveBarter(barter.id)}>
-                  Approve
-                </Button>
-                <Button colorScheme="blue" variant="solid" onClick={() => handleViewDetails(barter)}>
-                  View Details
-                </Button>
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
+        <Tbody></Tbody>
       </Table>
-
-      {/* Modal untuk menampilkan detail item-barang yang ingin ditukar */}
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Barter Details</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            {selectedBarter && (
-              <div>
-                <p>
-                  <strong>Requester Item:</strong> {selectedBarter.requesterItem.name}
-                </p>
-                <p>
-                  <strong>Desired Item:</strong> {selectedBarter.desiredItem.name}
-                </p>
-                {/* Tambahkan detail item sesuai kebutuhan */}
-              </div>
-            )}
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme="teal" onClick={onClose}>
-              Close
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </div>
   );
 };

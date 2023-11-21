@@ -45,7 +45,6 @@ function Item() {
     <Card>
       <TableContainer>
         <Table variant="simple">
-          <TableCaption>Item List</TableCaption>
           <Thead>
             <Tr>
               <Th>#</Th>

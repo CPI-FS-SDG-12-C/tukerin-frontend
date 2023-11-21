@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { SimpleGrid, CardHeader, Button, Heading, CardFooter, CardBody, Card, Text, Flex, Avatar, Box, Image, Select, AlertIcon, Alert } from "@chakra-ui/react";
+import { SimpleGrid, CardHeader, Button, Heading, CardBody, Card, Text, Flex, Avatar, Box, Image, Select, AlertIcon, Alert } from "@chakra-ui/react";
 import useTokenStore from "../../config/store";
 import { useGet } from "../../config/config";
+import { useAPI } from "../../config/api";
+import { useNavigate } from "react-router-dom";
 
 export default function TradeDetail() {
   const location = useLocation();
@@ -10,21 +12,48 @@ export default function TradeDetail() {
   const [tradeAlert, setTradeAlert] = useState(false);
   const token = useTokenStore((state) => state.token);
   const [items, status] = useGet("items", token);
+  const { post } = useAPI((state) => state);
+  let navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   // State to track the selected item from your inventory
   const [selectedMyItem, setSelectedMyItem] = useState(null);
 
+  // State to track the desiredItemId
+  const [desiredItemId, setDesiredItemId] = useState(null);
+
   const handleSelectMyItem = (event) => {
     const selectedItem = items.find((item) => item.id === event.target.value);
     setSelectedMyItem(selectedItem);
-    console.log(selectedItem);
+
+    // Set the desiredItemId in the state
+    setDesiredItemId(selectedItem ? selectedItem.id : null);
+
+    // console.log(selectedItem);
   };
 
-  const handleTrade = () => {
+  const data = {
+    requesterItemId: tradeData.selectedItemId,
+    desiredItemId: desiredItemId,
+  };
+
+  // console.log(data);
+
+  const handleTrade = async () => {
     if (selectedMyItem) {
       // Lakukan tindakan perdagangan atau pembaruan database lainnya di sini
       // Misalnya, kirim permintaan perdagangan ke 'nameUser'
-      setTradeAlert(true);
+      setIsLoading(true);
+      try {
+        const res = await post("/trade/requests", data);
+        if (res) {
+          setTradeAlert(true);
+          setTimeout(() => {
+            setTradeAlert(false);
+            navigate("/dashboard/my-items");
+          }, 3000);
+        }
+      } catch (error) {}
     } else {
       console.log("Tidak ada item yang dipilih untuk ditukar");
     }
@@ -32,7 +61,7 @@ export default function TradeDetail() {
 
   const alertTrade = () => {
     return (
-      <Alert status="info" onClose={() => setTradeAlert(false)}>
+      <Alert mb={4} status="info" onClose={() => setTradeAlert(false)}>
         <AlertIcon />
         Trade request sent to {tradeData.selectedItemUser}. Get ready!
       </Alert>
@@ -41,6 +70,7 @@ export default function TradeDetail() {
 
   return (
     <>
+      {tradeAlert && alertTrade()}
       <SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(490px, 2fr))">
         <Card>
           <CardHeader>
@@ -95,7 +125,6 @@ export default function TradeDetail() {
           </CardBody>
         </Card>
       </SimpleGrid>
-      {tradeAlert && alertTrade()}
     </>
   );
 }

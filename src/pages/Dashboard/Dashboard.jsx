@@ -27,6 +27,7 @@ const donations = [
 
 const trades = [
   { name: "List Trade Items", icon: AiOutlineOrderedList, to: "/list-trade-items" },
+  { name: "Trade Request", icon: AiOutlineOrderedList, to: "/trade-request" },
   { name: "Trade Approvel", icon: GiTrade, to: "/trade-approval" },
 ];
 

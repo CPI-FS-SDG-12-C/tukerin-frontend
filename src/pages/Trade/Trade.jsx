@@ -9,7 +9,6 @@ function Trade() {
   // Ganti URL dan token sesuai kebutuhan
   const [items, status] = useGet("items/trade", token);
   const navigate = useNavigate();
-  console.log(items);
 
   const [selectedTrade, setSelectedTrade] = useState(null);
 
@@ -17,10 +16,10 @@ function Trade() {
     setSelectedTrade(selectedItem);
     navigate("detail", {
       state: {
+        selectedItemId: selectedItem.id,
         selectedItemName: selectedItem.name,
         selectedItemDescription: selectedItem.describtion,
         selectedItemUser: selectedItem.user?.fullName,
-        itemToGiveName: "Item yang akan diberikan",
       },
     });
   };
