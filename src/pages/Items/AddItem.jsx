@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FormControl, Card, CardFooter, CardBody, CardHeader, Heading, Text, FormLabel, Input, FormErrorMessage, Button, SimpleGrid, FormHelperText, AlertIcon, Alert } from "@chakra-ui/react";
+import { FormControl, Card, CardFooter, CardBody, Select, CardHeader, Heading, Text, FormLabel, Input, FormErrorMessage, Button, SimpleGrid, FormHelperText, AlertIcon, Alert } from "@chakra-ui/react";
 import { useAPI } from "../../config/api";
 import useTokenStore from "../../config/store";
 import { useNavigate } from "react-router-dom";
@@ -16,6 +16,7 @@ function AddItem() {
   const [formData, setFormData] = useState({
     name: "",
     describtion: "",
+    statusTrade: "",
   });
 
   const handleInputChange = (e) => {
@@ -28,6 +29,7 @@ function AddItem() {
 
   const isNameError = formData.name === "";
   const isDescriptionError = formData.describtion === "";
+  const isStatusTradeError = formData.statusTrade == "";
 
   const handleAddButtonClick = async () => {
     try {
@@ -48,7 +50,7 @@ function AddItem() {
   useEffect(() => {
     if (complete) {
       const timeoutId = setTimeout(() => {
-        navigate("/dashboard/items");
+        navigate("/dashboard/my-items");
       }, 2000);
 
       return () => clearTimeout(timeoutId);
@@ -57,7 +59,6 @@ function AddItem() {
 
   return (
     <SimpleGrid spacing={4} templateColumns="repeat(auto-fill, minmax(200px, 1fr)">
-      <Text fontSize="20px">Add Items</Text>
       <Card>
         <CardBody>
           <FormControl isInvalid={isNameError}>
@@ -70,6 +71,15 @@ function AddItem() {
             <Input type="text" name="describtion" value={formData.describtion} onChange={handleInputChange} />
             {!isDescriptionError ? <FormHelperText>👍</FormHelperText> : <FormErrorMessage>Description is required.</FormErrorMessage>}
           </FormControl>
+          {/* <FormControl isInvalid={isStatusTradeError}>
+            <FormLabel>Status</FormLabel>
+            <Input type="text" name="statusTrade" value={formData.statusTrade} onChange={handleInputChange} />
+            {!isStatusTradeError ? <FormHelperText>👍</FormHelperText> : <FormErrorMessage>StatusTrade is required.</FormErrorMessage>}
+          </FormControl> */}
+          <Select placeholder="Status Trade" name="statusTrade" onChange={handleInputChange}>
+            <option value="open">open</option>
+            <option value="keep">keep</option>
+          </Select>
         </CardBody>
         <CardFooter>
           <Button mb={5} onClick={handleAddButtonClick} colorScheme="teal" variant="solid">

@@ -1,4 +1,4 @@
-import { IconButton, Avatar, Box, CloseButton, Flex, HStack, VStack, Icon, useColorModeValue, Text, Drawer, DrawerContent, useDisclosure, Menu, MenuButton, MenuDivider, MenuItem, MenuList } from "@chakra-ui/react";
+import { IconButton, Avatar, Box, CloseButton, Flex, HStack, VStack, Icon, useColorModeValue, Text, Drawer, DrawerContent, useDisclosure, Menu, MenuButton, MenuDivider, MenuItem, MenuList, Card } from "@chakra-ui/react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Link } from "react-router-dom";
 
@@ -10,9 +10,13 @@ import { GiTrade } from "react-icons/gi";
 import useTokenStore from "../../config/store";
 import Item from "../Items/Item";
 import AddItem from "../Items/AddItem";
+import BreadcrumbComponent from "../../components/Breadcrumb";
+import Trade from "../Trade/Trade";
+import TradeDetail from "../Trade/TradeDetail";
+import TradeApproval from "../Trade/TradeApproval";
 
 const items = [
-  { name: "List Items", icon: AiOutlineOrderedList, to: "/items" },
+  { name: "My Items", icon: AiOutlineOrderedList, to: "/my-items" },
   { name: "Add Items", icon: BiAddToQueue, to: "/add-items" },
 ];
 
@@ -249,10 +253,14 @@ const Dashboard = () => {
       {/* mobilenav */}
       <MobileNav onOpen={onOpen} />
       <Box ml={{ base: 0, md: 60 }} p="4">
+        <BreadcrumbComponent />
         {/* Content */}
         <Routes>
-          <Route path="/items" element={<Item />} />
+          <Route path="/my-items" element={<Item />} />
           <Route path="/add-items" element={<AddItem />} />
+          <Route path="/list-trade-items" element={<Trade />} />
+          <Route path="/list-trade-items/detail" element={<TradeDetail />} />
+          <Route path="/trade-approval" element={<TradeApproval />} />
         </Routes>
       </Box>
     </Box>
