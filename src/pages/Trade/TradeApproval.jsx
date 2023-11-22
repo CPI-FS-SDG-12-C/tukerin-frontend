@@ -1,41 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure } from "@chakra-ui/react";
-import { useAPI } from "../../config/api";
+import { Table, Thead, Tbody, Tr, Th, Td, Button, Modal, Text, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure } from "@chakra-ui/react";
+import useTokenStore from "../../config/store";
+import { useGet } from "../../config/config";
 
 const TradeApproval = () => {
-  const { get, post } = useAPI((state) => state);
-  const [barterRequests, setBarterRequests] = useState([]);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedBarter, setSelectedBarter] = useState(null);
+  const token = useTokenStore((state) => state.token);
 
-  useEffect(() => {
-    // Mendapatkan daftar barter requests saat komponen dimount
-    fetchBarterRequests();
-  }, []);
-
-  const fetchBarterRequests = async () => {
+  function parseJwt(token) {
     try {
-      const response = await get("trade/all");
-      setBarterRequests(response.data);
-    } catch (error) {
-      console.error("Error fetching barter requests:", error);
+      return JSON.parse(atob(token.split(".")[1]));
+    } catch (e) {
+      return null;
     }
-  };
+  }
+  const decodedToken = parseJwt(token);
+  const id = decodedToken?.id;
 
-  const handleApproveBarter = async (barterId) => {
-    try {
-      // Menyetujui barter request
-      await post("barter/approve", { barterId });
-      // Refresh daftar barter requests setelah menyetujui
-      fetchBarterRequests();
-    } catch (error) {
-      console.error("Error approving barter:", error);
-    }
-  };
+  const [items, status] = useGet(`trade/requests/655b27b283a135753b8b9c35/items`, token);
 
-  const handleViewDetails = (barter) => {
-    setSelectedBarter(barter);
-    onOpen();
+  if (status === 404) {
+    return <div>Barter request not found.</div>;
+  }
+
+  const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = { day: "numeric", month: "long", year: "numeric" };
+    const formattedDate = date.toLocaleString("en-US", options);
+    return formattedDate;
   };
 
   return (
@@ -49,7 +40,25 @@ const TradeApproval = () => {
             <Th>Action</Th>
           </Tr>
         </Thead>
-        <Tbody></Tbody>
+        <Tbody>
+          {Array.isArray(items) ? (
+            items.map((item, index) => (
+              <Tr key={index}>
+                <Td>{item.name}</Td>
+                <Td>{item.describtion}</Td>
+                <Td>
+                  <Button onClick={() => handleAction(item)}>Approve</Button>
+                </Td>
+              </Tr>
+            ))
+          ) : (
+            <Tr>
+              <Td colSpan={3}>
+                <Text fontSize="20px">List Items is Empty</Text>
+              </Td>
+            </Tr>
+          )}
+        </Tbody>
       </Table>
     </div>
   );
