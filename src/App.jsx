@@ -6,7 +6,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Login from "./pages/Login/Login";
 import NotFound from "./pages/NotFound/NotFound";
 import Register from "./pages/Register/Register";
-import HomePage from "./pages/homepage/HomePage";
+import HomePage from "./pages/HomePage/HomePage";
 
 const ProtectedRoute = ({ children }) => {
   const token = useTokenStore((state) => state.token);
