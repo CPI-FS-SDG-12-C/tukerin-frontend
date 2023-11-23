@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
 const defaultAxios = axios.create({
-  baseURL: "https://back-tukerin.vercel.app/api/",
+  baseURL: "https://backend-tukerin.vercel.app/api/",
   timeout: 5000,
 });
 
