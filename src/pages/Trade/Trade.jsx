@@ -9,6 +9,7 @@ function Trade() {
   // Ganti URL dan token sesuai kebutuhan
   const [items, status] = useGet("items/trade", token);
   const navigate = useNavigate();
+  console.log("data : ", items);
 
   const [selectedTrade, setSelectedTrade] = useState(null);
 
@@ -19,7 +20,7 @@ function Trade() {
         selectedItemId: selectedItem.id,
         selectedItemName: selectedItem.name,
         selectedItemDescription: selectedItem.describtion,
-        selectedItemUser: selectedItem.user?.fullName,
+        selectedItemUser: selectedItem.userID?.fullName,
       },
     });
   };
@@ -41,7 +42,7 @@ function Trade() {
                   <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
                     <Avatar name="Segun Adebayo" src="https://bit.ly/sage-adebayo" />
                     <Box>
-                      <Heading size="sm">{item.user?.fullName || "Unknown User"}</Heading>
+                      <Heading size="sm">{item.userID?.fullName || "Unknown User"}</Heading>
                     </Box>
                   </Flex>
                 </Flex>

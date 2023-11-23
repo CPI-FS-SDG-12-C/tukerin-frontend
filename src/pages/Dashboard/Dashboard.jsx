@@ -14,6 +14,7 @@ import BreadcrumbComponent from "../../components/Breadcrumb";
 import Trade from "../Trade/Trade";
 import TradeDetail from "../Trade/TradeDetail";
 import TradeApproval from "../Trade/TradeApproval";
+import TradeHistory from "../Trade/TradeHistory";
 
 const items = [
   { name: "My Items", icon: AiOutlineOrderedList, to: "/my-items" },
@@ -27,7 +28,7 @@ const donations = [
 
 const trades = [
   { name: "List Trade Items", icon: AiOutlineOrderedList, to: "/list-trade-items" },
-  { name: "Trade Request", icon: AiOutlineOrderedList, to: "/trade-request" },
+  { name: "Trade History", icon: AiOutlineOrderedList, to: "/trade-history" },
   { name: "Trade Approvel", icon: GiTrade, to: "/trade-approval" },
 ];
 
@@ -262,6 +263,7 @@ const Dashboard = () => {
           <Route path="/list-trade-items" element={<Trade />} />
           <Route path="/list-trade-items/detail" element={<TradeDetail />} />
           <Route path="/trade-approval" element={<TradeApproval />} />
+          <Route path="/trade-history" element={<TradeHistory />} />
         </Routes>
       </Box>
     </Box>

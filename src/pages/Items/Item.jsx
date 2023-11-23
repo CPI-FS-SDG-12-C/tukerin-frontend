@@ -10,6 +10,8 @@ function Item() {
 
   const [items, status] = useGet("items", token);
 
+  console.log("items", items);
+
   if (!status) {
     return <div>Loading...</div>;
   }
@@ -65,7 +67,7 @@ function Item() {
               </Tr>
             ) : (
               items
-                .filter((item) => !item.barter) // Filter item yang belum terlibat dalam barter
+                // .filter((item) => !item.barter) // Filter item yang belum terlibat dalam barter
                 .map((item, index) => (
                   <Tr key={item.id}>
                     <Td>{index + 1}</Td>

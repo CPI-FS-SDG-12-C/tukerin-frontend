@@ -1,65 +1,76 @@
 import React, { useState, useEffect } from "react";
-import { Table, Thead, Tbody, Tr, Th, Td, Button, Modal, Text, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure } from "@chakra-ui/react";
+import { Table, Thead, Tbody, Tr, Th, Td, Button, AlertIcon, Alert, Text, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter, useDisclosure, Card } from "@chakra-ui/react";
 import useTokenStore from "../../config/store";
 import { useGet } from "../../config/config";
+import { useAPI } from "../../config/api";
+import { useNavigate } from "react-router-dom";
 
 const TradeApproval = () => {
+  const [tradeAlert, setTradeAlert] = useState(false);
   const token = useTokenStore((state) => state.token);
-
-  function parseJwt(token) {
-    try {
-      return JSON.parse(atob(token.split(".")[1]));
-    } catch (e) {
-      return null;
-    }
-  }
-  const decodedToken = parseJwt(token);
-  const id = decodedToken?.id;
-
-  const [items, status] = useGet(`trade/requests/655b27b283a135753b8b9c35/items`, token);
+  const { post } = useAPI((state) => state);
+  let navigate = useNavigate();
+  const [items, status] = useGet(`trade/approval`, token);
+  console.log("Data", items);
 
   if (status === 404) {
     return <div>Barter request not found.</div>;
   }
 
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    const options = { day: "numeric", month: "long", year: "numeric" };
-    const formattedDate = date.toLocaleString("en-US", options);
-    return formattedDate;
+  const handleAction = async () => {
+    console.log("Halo");
+    try {
+      const id_items = items.length > 0 ? items[0].id : null;
+      console.log(id_items);
+
+      if (!id_items) {
+        console.error("No items to approve");
+        return;
+      }
+      const res = await post(`/trade/approval/${id_items}`, {}, token);
+      if (res) {
+        setTradeAlert(true);
+        setTimeout(() => {
+          setTradeAlert(false);
+          navigate("/dashboard/trade-history");
+        }, 2000);
+      }
+    } catch (error) {}
+  };
+
+  const alertTrade = () => {
+    return (
+      <Alert mb={4} status="info" onClose={() => setTradeAlert(false)}>
+        <AlertIcon />
+        Trade Success
+      </Alert>
+    );
   };
 
   return (
     <div>
+      {tradeAlert && alertTrade()}
       <h1>Barter Requests</h1>
-      <Table variant="simple">
-        <Thead>
-          <Tr>
-            <Th>Requester Item</Th>
-            <Th>Desired Item</Th>
-            <Th>Action</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {Array.isArray(items) ? (
-            items.map((item, index) => (
-              <Tr key={index}>
-                <Td>{item.name}</Td>
-                <Td>{item.describtion}</Td>
-                <Td>
-                  <Button onClick={() => handleAction(item)}>Approve</Button>
-                </Td>
-              </Tr>
-            ))
-          ) : (
-            <Tr>
-              <Td colSpan={3}>
-                <Text fontSize="20px">List Items is Empty</Text>
-              </Td>
-            </Tr>
+      <Card mt={4}>
+        {Array.isArray(items) && items.length > 0 ? (
+          items.map((item, index) => (
+            <div key={index}>
+              <h3>Item {index + 1}</h3>
+              <p>Requester Item: {item.name}</p>
+              <p>Desired Item: {item.describtion}</p>
+              <hr />
+            </div>
+          ))
+        ) : (
+          <Text fontSize="20px">List Items is Empty</Text>
+        )}
+        {Array.isArray(items) &&
+          items.length > 0 && ( // Check if there are items
+            <Button colorScheme="teal" onClick={handleAction}>
+              Approve
+            </Button>
           )}
-        </Tbody>
-      </Table>
+      </Card>
     </div>
   );
 };
